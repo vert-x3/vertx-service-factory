@@ -1,0 +1,10 @@
+{
+  "main": "io.vertx.mymodule.Verticle4",
+
+  "options": {
+    "config" : {
+      "foo": "bar",
+      "socks": "eeek"
+    }
+  }
+}

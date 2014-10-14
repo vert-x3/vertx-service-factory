@@ -1,0 +1,12 @@
+{
+  "main": "io.vertx.mymodule.Verticle3",
+
+  "options": {
+    "config" : {
+      "foo": "bar"
+    },
+    "worker": true,
+    "isolationGroup": "mygroup",
+    "extraClasspath": ["blah", "wibble"]
+  }
+}
