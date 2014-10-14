@@ -51,6 +51,7 @@ At minimum the JSON must provide a `main` field which determines the actual vert
     }
 
 or
+
     {
         "main": "app.js"
     }
