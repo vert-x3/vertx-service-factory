@@ -38,7 +38,7 @@ Or can be deployed on the command line with:
 When you ask to deploy a service, the service factory first looks for a descriptor file on the classpath.
 
 The descriptor file name is given by the service name, where the `:` has been replaced by `.` (because `:` is a reserved
-character on Windows) and has has `.json` appended to it.
+character on Windows) and has had `.json` appended to it.
 
 E.g. `com.mycompany.clever-db-service.1.0.json`
 
