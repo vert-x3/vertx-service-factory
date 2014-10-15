@@ -16,11 +16,8 @@
 
 package io.vertx.service;
 
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
 import io.vertx.core.VertxException;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
@@ -42,17 +39,14 @@ import java.util.Scanner;
 public class ServiceVerticleFactory implements VerticleFactory {
 
   @Override
-  public void init(Vertx vertx) {
+  public boolean requiresResolve() {
+    return true;
   }
 
   @Override
-  public String prefix() {
-    return "service";
-  }
-
-  @Override
-  public Verticle createVerticle(String verticleName, ClassLoader classLoader) throws Exception {
-    String descriptorFile = verticleName.replace(':', '.') + ".json";
+  public String resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader) throws Exception {
+    identifier = VerticleFactory.removePrefix(identifier);
+    String descriptorFile = identifier.replace(':', '.') + ".json";
     JsonObject descriptor;
     try (InputStream is = classLoader.getResourceAsStream(descriptorFile)) {
       if (is == null) {
@@ -71,44 +65,30 @@ public class ServiceVerticleFactory implements VerticleFactory {
     if (main == null) {
       throw new VertxException(descriptorFile + " does not contain a main field");
     }
-    JsonObject joptions = descriptor.getObject("options");
-    DeploymentOptions options = joptions == null ? new DeploymentOptions() : new DeploymentOptions(joptions);
-    return new ServiceVerticle(main, options);
+
+    // Any options specified in the service config will override anything specified at deployment time
+    // With the exception of config which can be overridden with config provided at deployment time
+    JsonObject depOptions = deploymentOptions.toJson();
+    JsonObject depConfig = depOptions.getObject("config", new JsonObject());
+    JsonObject serviceOptions = descriptor.getObject("options", new JsonObject());
+    JsonObject serviceConfig = serviceOptions.getObject("config", new JsonObject());
+    depOptions.mergeIn(serviceOptions);
+    serviceConfig.mergeIn(depConfig);
+    depOptions.putObject("config", serviceConfig);
+    deploymentOptions.fromJson(depOptions);
+
+    return main;
   }
 
   @Override
-  public void close() {
+  public String prefix() {
+    return "service";
   }
 
-  private class ServiceVerticle extends AbstractVerticle {
-
-    final String main;
-    final DeploymentOptions options;
-
-    private ServiceVerticle(String main, DeploymentOptions options) {
-      this.main = main;
-      this.options = options;
-    }
-
-    @Override
-    public void start(Future<Void> startFuture) throws Exception {
-      JsonObject conf = vertx.context().config();
-      // Merge in the conf provided by the user
-      JsonObject serviceConf = options.getConfig() == null ? new JsonObject() : options.getConfig();
-      serviceConf.mergeIn(conf);
-      options.setConfig(serviceConf);
-      vertx.deployVerticle(main, options, res -> {
-        if (res.succeeded()) {
-          startFuture.complete();
-        } else {
-          startFuture.fail(res.cause());
-        }
-      });
-    }
-
-    // NOTE
-    // No need to override stop and explicitly undeploy as the indirected deployment will be a child
-    // deployment of the service deployment so will be automatically undeployed when the parent is
-    // undeployed
+  @Override
+  public Verticle createVerticle(String verticleName, ClassLoader classLoader) throws Exception {
+    throw new IllegalStateException("Shouldn't be called");
   }
+
+
 }
