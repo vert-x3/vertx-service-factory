@@ -3,7 +3,8 @@
 This is a `VerticleFactory` implementation which deploys a verticle given a service name.
 
 The service name is used to lookup a JSON descriptor file which determines the actual verticle that is to be deployed,
-and can also contain deployment options for the verticle such as whether it should be run as a worker.
+and can also contain deployment options for the verticle such as whether it should be run as a worker, and default
+config for the service.
 
 It is useful as it decouples the service user from the actual verticle that is deployed and it allows the service
 to provide default deployment options and configuration.
@@ -32,6 +33,22 @@ The verticle can be deployed programmatically like this:
 Or can be deployed on the command line with:
 
     vertx run maven:com.mycompany:clever-db-service:1.0
+    
+Vert.x picks up `VerticleFactory` implementations from the classpath, so you just need to make sure the`ServiceVerticleFactory`
+ jar is on the classpath.
+    
+It will already be on the classpath if you are running `vertx` on the command using the full distribution.
+
+If you are running embedded you can declare a Maven dependency to it in your pom.xml (or Gradle config):
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-service-factory</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    
+You can also register `VerticleFactory` instances programmatically on your `Vertx` instance using the `registerVerticleFactory`
+method.
 
 ## Service descriptor
 
@@ -56,8 +73,7 @@ or
         "main": "app.js"
     }
 
-The JSON can also provide an `options` field which maps exactly to the `DeploymentOptions` object which you use when
- you programmatically deploy a verticle, e.g.
+The JSON can also provide an `options` field which maps exactly to a `DeploymentOptions` object.
 
     {
         "main": "com.mycompany.cleverdb.MainVerticle",
@@ -69,4 +85,9 @@ The JSON can also provide an `options` field which maps exactly to the `Deployme
             "isolationGroup": "mygroup"
         }
     }
+    
+When deploying a service from a service descriptor, any fields that are specified in the descriptor, such as `worker`,
+`isolationGroup`, etc cannot be overridden by any deployment options passed in at deployment time.
 
+The exception is `config`. Any configuration passed in at deploy time will override any corresponding fields in any
+config present in the descriptor file.
