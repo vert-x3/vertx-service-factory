@@ -34,6 +34,8 @@ Or can be deployed on the command line with:
 
     vertx run maven:com.mycompany:clever-db-service:1.0
     
+## Making it available    
+    
 Vert.x picks up `VerticleFactory` implementations from the classpath, so you just need to make sure the`ServiceVerticleFactory`
  jar is on the classpath.
     
