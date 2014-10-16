@@ -24,8 +24,8 @@
   <baseDirectory>/</baseDirectory>
   <fileSets>
     <fileSet>
+      <directory>${project.build.outputDirectory}</directory>
       <outputDirectory>/</outputDirectory>
-      <directory>src/main/resources</directory>
       <excludes>
         <exclude>service.json</exclude>
       </excludes>
