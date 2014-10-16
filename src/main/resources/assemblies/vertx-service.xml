@@ -33,7 +33,7 @@
   </fileSets>
   <files>
     <file>
-      <source>src/main/resources/service.json</source>
+      <source>${project.build.outputDirectory}/service.json</source>
       <outputDirectory>/</outputDirectory>
       <destName>${groupId}.${artifactId}.${version}.json</destName>
     </file>
