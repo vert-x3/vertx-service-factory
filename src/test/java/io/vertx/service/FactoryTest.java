@@ -3,7 +3,6 @@ package io.vertx.service;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mymodule.Verticle1;
-import io.vertx.mymodule.Verticle2;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
@@ -17,13 +16,13 @@ import java.util.concurrent.CountDownLatch;
 public class FactoryTest extends VertxTestBase {
 
   @Test
-  public void testDeploy1() throws Exception {
+  public void testDeployWithVersion() throws Exception {
     testDeploy("my:module:1.0", Verticle1.class.getName());
   }
 
   @Test
-  public void testDeploy2() throws Exception {
-    testDeploy("somename", Verticle2.class.getName());
+  public void testDeployWithoutVersion() throws Exception {
+    testDeploy("my:module", Verticle1.class.getName());
   }
 
   private void testDeploy(String serviceName, String verticleClassName) throws Exception {
@@ -42,12 +41,7 @@ public class FactoryTest extends VertxTestBase {
 
   @Test
   public void testUndeploy1() throws Exception {
-    testUndeploy("my:module:1.0", Verticle1.class.getName());
-  }
-
-  @Test
-  public void testUndeploy2() throws Exception {
-    testUndeploy("somename", Verticle2.class.getName());
+    testUndeploy("my:module", Verticle1.class.getName());
   }
 
   private void testUndeploy(String serviceName, String verticleClassName) throws Exception {
@@ -80,7 +74,7 @@ public class FactoryTest extends VertxTestBase {
     List<String> extraCP = Arrays.asList("foo");
     // These options should be overridden by those in the service descriptor
     DeploymentOptions options = new DeploymentOptions().setIsolationGroup("othergroup").setWorker(false).setExtraClasspath(extraCP);
-    vertx.deployVerticle("service:my:optionsmodule:1.0", options, res -> {
+    vertx.deployVerticle("service:my:optionsmodule", options, res -> {
       assertTrue(res.succeeded());
       latch.countDown();
     });
@@ -96,11 +90,22 @@ public class FactoryTest extends VertxTestBase {
     });
     // We override the config - this overrides any config fields in the service descriptor config
     JsonObject conf = new JsonObject().putString("foo", "wibble").putString("quux", "blah");
-    vertx.deployVerticle("service:my:confmodule:1.0", new DeploymentOptions().setConfig(conf), res -> {
+    vertx.deployVerticle("service:my:confmodule", new DeploymentOptions().setConfig(conf), res -> {
       assertTrue(res.succeeded());
       latch.countDown();
     });
     awaitLatch(latch);
+  }
+
+  @Test
+  public void testInvalidServiceID() throws Exception {
+    vertx.deployVerticle("service:uuhqwuhwd", res -> {
+      assertTrue(res.failed());
+      assertTrue(res.cause() instanceof IllegalArgumentException);
+      assertTrue(res.cause().getMessage().startsWith("Invalid service identifier"));
+      testComplete();
+    });
+    await();
   }
 
 

@@ -46,7 +46,8 @@ public class ServiceVerticleFactory implements VerticleFactory {
   @Override
   public String resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader) throws Exception {
     identifier = VerticleFactory.removePrefix(identifier);
-    String descriptorFile = identifier.replace(':', '.') + ".json";
+    ServiceIndentifier serviceID = new ServiceIndentifier(identifier);
+    String descriptorFile = serviceID.descriptorFilename();
     JsonObject descriptor;
     try (InputStream is = classLoader.getResourceAsStream(descriptorFile)) {
       if (is == null) {
