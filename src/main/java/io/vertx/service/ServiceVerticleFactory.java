@@ -70,12 +70,12 @@ public class ServiceVerticleFactory implements VerticleFactory {
     // Any options specified in the service config will override anything specified at deployment time
     // With the exception of config which can be overridden with config provided at deployment time
     JsonObject depOptions = deploymentOptions.toJson();
-    JsonObject depConfig = depOptions.getObject("config", new JsonObject());
-    JsonObject serviceOptions = descriptor.getObject("options", new JsonObject());
-    JsonObject serviceConfig = serviceOptions.getObject("config", new JsonObject());
+    JsonObject depConfig = depOptions.getJsonObject("config", new JsonObject());
+    JsonObject serviceOptions = descriptor.getJsonObject("options", new JsonObject());
+    JsonObject serviceConfig = serviceOptions.getJsonObject("config", new JsonObject());
     depOptions.mergeIn(serviceOptions);
     serviceConfig.mergeIn(depConfig);
-    depOptions.putObject("config", serviceConfig);
+    depOptions.put("config", serviceConfig);
     deploymentOptions.fromJson(depOptions);
 
     return main;

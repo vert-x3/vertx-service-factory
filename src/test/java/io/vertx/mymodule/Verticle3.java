@@ -35,7 +35,7 @@ public class Verticle3 extends AbstractVerticle {
 
     vertx.runOnContext(v -> {
       List<String> extraCP = Arrays.asList("blah", "wibble");
-      DeploymentOptions expected = new DeploymentOptions().setConfig(new JsonObject().putString("foo", "bar"))
+      DeploymentOptions expected = new DeploymentOptions().setConfig(new JsonObject().put("foo", "bar"))
         .setWorker(true).setIsolationGroup("mygroup").setExtraClasspath(extraCP);
       Deployment dep = ((VertxInternal) vertx).getDeployment(vertx.context().deploymentID());
       vertx.eventBus().publish("moduleStarted", expected.equals(dep.deploymentOptions()));

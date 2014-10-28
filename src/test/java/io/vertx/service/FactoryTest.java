@@ -89,7 +89,7 @@ public class FactoryTest extends VertxTestBase {
       latch.countDown();
     });
     // We override the config - this overrides any config fields in the service descriptor config
-    JsonObject conf = new JsonObject().putString("foo", "wibble").putString("quux", "blah");
+    JsonObject conf = new JsonObject().put("foo", "wibble").put("quux", "blah");
     vertx.deployVerticle("service:my:confmodule", new DeploymentOptions().setConfig(conf), res -> {
       assertTrue(res.succeeded());
       latch.countDown();
