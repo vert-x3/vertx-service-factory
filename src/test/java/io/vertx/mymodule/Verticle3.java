@@ -18,6 +18,7 @@ package io.vertx.mymodule;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
 import io.vertx.core.impl.Deployment;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.json.JsonObject;
@@ -37,7 +38,7 @@ public class Verticle3 extends AbstractVerticle {
       List<String> extraCP = Arrays.asList("blah", "wibble");
       DeploymentOptions expected = new DeploymentOptions().setConfig(new JsonObject().put("foo", "bar"))
         .setWorker(true).setIsolationGroup("mygroup").setExtraClasspath(extraCP);
-      Deployment dep = ((VertxInternal) vertx).getDeployment(vertx.context().deploymentID());
+      Deployment dep = ((VertxInternal) vertx).getDeployment(Vertx.currentContext().deploymentID());
       vertx.eventBus().publish("moduleStarted", expected.equals(dep.deploymentOptions()));
     });
   }
