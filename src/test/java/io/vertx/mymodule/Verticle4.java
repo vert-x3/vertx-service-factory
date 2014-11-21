@@ -17,6 +17,7 @@
 package io.vertx.mymodule;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -26,7 +27,7 @@ public class Verticle4 extends AbstractVerticle {
 
   @Override
   public void start() throws Exception {
-    JsonObject conf = vertx.context().config();
+    JsonObject conf = Vertx.currentContext().config();
     vertx.eventBus().publish("moduleStarted", conf.getString("foo").equals("wibble") &&
                              conf.getString("quux").equals("blah") && conf.getString("socks").equals("eeek"));
   }
