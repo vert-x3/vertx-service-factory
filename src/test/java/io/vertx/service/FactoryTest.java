@@ -35,7 +35,7 @@ public class FactoryTest extends VertxTestBase {
       assertTrue(res.succeeded());
       latch.countDown();
     });
-    waitUntil(() -> vertx.deployments().size() == 1);
+    waitUntil(() -> vertx.deploymentIDs().size() == 1);
     awaitLatch(latch);
   }
 
@@ -55,12 +55,12 @@ public class FactoryTest extends VertxTestBase {
     });
     vertx.deployVerticle("service:" + serviceName, res -> {
       assertTrue(res.succeeded());
-      vertx.undeployVerticle(res.result(), res2 -> {
+      vertx.undeploy(res.result(), res2 -> {
         assertTrue(res2.succeeded());
         latch.countDown();
       });
     });
-    waitUntil(() -> vertx.deployments().size() == 0);
+    waitUntil(() -> vertx.deploymentIDs().size() == 0);
     awaitLatch(latch);
   }
 
