@@ -66,7 +66,8 @@ When you ask to deploy a service, the service factory first looks for a descript
 The descriptor file name is given by the service owner and service name concatenated with `.` and with the `.json` file
 extension.
 
-E.g. `com.mycompany.clever-db-service.json`
+E.g. for a service identifier of `com.mycompany:clever-db-service` it would like for a descriptor file called
+`com.mycompany.clever-db-service.json` on the classpath.
 
 The descriptor file is a text file which must contain a valid JSON object.
 
