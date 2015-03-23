@@ -63,10 +63,10 @@ method.
 
 When you ask to deploy a service, the service factory first looks for a descriptor file on the classpath.
 
-The descriptor file name is given by the service identifier, where the `:` has been replaced by `.` (because `:` is a reserved
-character on Windows) and has had `.json` appended to it.
+The descriptor file name is given by the service owner and service name concatenated with `.` and with the `.json` file
+extension.
 
-E.g. `com.mycompany.clever-db-service.1.0.json`
+E.g. `com.mycompany.clever-db-service.json`
 
 The descriptor file is a text file which must contain a valid JSON object.
 
@@ -100,39 +100,3 @@ When deploying a service from a service descriptor, any fields that are specifie
 
 The exception is `config`. Any configuration passed in at deploy time will override any corresponding fields in any
 config present in the descriptor file.
-
-## Predefined Maven assembly descriptor
-
-The jar provided by this project provides a predefined assembly descriptor that will help you to create service packaging
-with Maven:
-
-```
-<plugin>
-  <artifactId>maven-assembly-plugin</artifactId>
-  <version>2.4.1</version>
-  <dependencies>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-factory</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-  </dependencies>
-  <executions>
-    <execution>
-      <id>package-vertx-service</id>
-      <goals>
-        <goal>single</goal>
-      </goals>
-      <configuration>
-        <appendAssemblyId>false</appendAssemblyId>
-        <descriptorRefs>
-          <descriptorRef>vertx-service</descriptorRef>
-        </descriptorRefs>
-      </configuration>
-      <phase>package</phase>
-    </execution>
-  </executions>
-</plugin>
-```
-
-Your service file must be located at `src/main/resources/service.json` .
