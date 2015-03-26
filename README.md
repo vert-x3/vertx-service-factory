@@ -2,7 +2,7 @@
 
 This is a `VerticleFactory` implementation which deploys a verticle given a service name.
 
-The service identifier is used to lookup a JSON descriptor file which determines the actual verticle that is to be deployed,
+The service name is used to lookup a JSON descriptor file which determines the actual verticle that is to be deployed,
 and can also contain deployment options for the verticle such as whether it should be run as a worker, and default
 config for the service.
 
@@ -11,35 +11,33 @@ to provide default deployment options and configuration.
 
 ## Service identifier
 
-The service identifier is a String and should be unique for the service. It is composed of three parts:
+The service name is simply a string - you can use anything you want, but it's a good convention to use a reverse
+domain name (rather like a Java package name) so not to clash with other similar named services that might be on your
+classpath. E.g.
 
-* The owner. This will usually be your organisation domain, e.g. `com.mycompany`
-* The service name. The name of the service, e.g. `clever-db-service`
-* The version. e.g. `1.0`
+Good names:
 
-The service identifier is composed of the above three parts concatenated with `:`, e.g. `com.mycompany:clever-db-service:1.0`
+    com.mycompany.services.clever-db-service
 
-The version is optional, and it is often omitted from the service, e.g.  `com.mycompany:clever-db-service` - this is ok
-as in many cases you have assembled your application at build-time and you know there is only one version of the service
-on the classpath (to have more than one would be an error).
+    org.widgets.widget-processor
 
-The observant of you may have noticed that this looks just like a Maven co-ordinate (groupID + artifactID + version) -
-no coincidence there. They have been chosen to be the same so we can easily lookup services from Maven repositories.
+Poor names (but they are still valid):
 
-For more info on that, see [`MavenServiceFactory`](https://github.com/vert-x3/maven-service-factory)
+    accounting-service
 
+    foo
 
 ## Usage
 
-When deploying the verticle use the prefix `service`.
+When deploying the service use the prefix `service:`, this selects the service verticle factory.
 
 The verticle can be deployed programmatically e.g.:
 
-    vertx.deployVerticle("service:com.mycompany:clever-db-service", ...)
+    vertx.deployVerticle("service:com.mycompany.clever-db-service", ...)
     
 Or can be deployed on the command line with:
 
-    vertx run maven:com.mycompany:clever-db-service
+    vertx run service:com.mycompany-clever-db-service
     
 ## Making it available    
     
@@ -63,13 +61,13 @@ method.
 
 When you ask to deploy a service, the service factory first looks for a descriptor file on the classpath.
 
-The descriptor file name is given by the service owner and service name concatenated with `.` and with the `.json` file
+The descriptor file name is given by the service name concatenated with the `.json` file
 extension.
 
-E.g. for a service identifier of `com.mycompany:clever-db-service` it would like for a descriptor file called
+E.g. for a service name of `com.mycompany.clever-db-service` it would like for a descriptor file called
 `com.mycompany.clever-db-service.json` on the classpath.
 
-The descriptor file is a text file which must contain a valid JSON object.
+The descriptor file is simply a text file which must contain a valid JSON object.
 
 At minimum the JSON must provide a `main` field which determines the actual verticle that will be deployed, e.g.
 
@@ -82,6 +80,14 @@ or
     {
         "main": "app.js"
     }
+
+or you could even redirect to a different verticle factory e.g. the Maven verticle factory to dynamically load the service
+from Maven at run-time:
+
+    {
+        "main": "maven:com.mycompany:clever-db:1,2::clever-db-service"
+    }
+
 
 The JSON can also provide an `options` field which maps exactly to a `DeploymentOptions` object.
 
