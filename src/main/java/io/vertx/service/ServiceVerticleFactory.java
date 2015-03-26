@@ -18,7 +18,6 @@ package io.vertx.service;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Verticle;
-import io.vertx.core.VertxException;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.VerticleFactory;
@@ -46,25 +45,24 @@ public class ServiceVerticleFactory implements VerticleFactory {
   @Override
   public String resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader) throws Exception {
     identifier = VerticleFactory.removePrefix(identifier);
-    ServiceIndentifier serviceID = new ServiceIndentifier(identifier);
-    String descriptorFile = serviceID.descriptorFilename();
+    String descriptorFile = identifier + ".json";
     JsonObject descriptor;
     try (InputStream is = classLoader.getResourceAsStream(descriptorFile)) {
       if (is == null) {
-        throw new VertxException("Cannot find file " + descriptorFile + " on classpath");
+        throw new IllegalArgumentException("Cannot find service descriptor file " + descriptorFile + " on classpath");
       }
       try (Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
         String conf = scanner.next();
         descriptor = new JsonObject(conf);
       } catch (NoSuchElementException e) {
-        throw new VertxException(descriptorFile + " is empty");
+        throw new IllegalArgumentException(descriptorFile + " is empty");
       } catch (DecodeException e) {
-        throw new VertxException(descriptorFile + " contains invalid json");
+        throw new IllegalArgumentException(descriptorFile + " contains invalid json");
       }
     }
     String main = descriptor.getString("main");
     if (main == null) {
-      throw new VertxException(descriptorFile + " does not contain a main field");
+      throw new IllegalArgumentException(descriptorFile + " does not contain a main field");
     }
 
     // Any options specified in the service config will override anything specified at deployment time

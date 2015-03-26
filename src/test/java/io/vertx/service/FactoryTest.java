@@ -16,13 +16,8 @@ import java.util.concurrent.CountDownLatch;
 public class FactoryTest extends VertxTestBase {
 
   @Test
-  public void testDeployWithVersion() throws Exception {
-    testDeploy("my:module:1.0", Verticle1.class.getName());
-  }
-
-  @Test
-  public void testDeployWithoutVersion() throws Exception {
-    testDeploy("my:module", Verticle1.class.getName());
+  public void testDeploy() throws Exception {
+    testDeploy("my.module", Verticle1.class.getName());
   }
 
   private void testDeploy(String serviceName, String verticleClassName) throws Exception {
@@ -41,7 +36,7 @@ public class FactoryTest extends VertxTestBase {
 
   @Test
   public void testUndeploy1() throws Exception {
-    testUndeploy("my:module", Verticle1.class.getName());
+    testUndeploy("my.module", Verticle1.class.getName());
   }
 
   private void testUndeploy(String serviceName, String verticleClassName) throws Exception {
@@ -74,7 +69,7 @@ public class FactoryTest extends VertxTestBase {
     List<String> extraCP = Arrays.asList("foo");
     // These options should be overridden by those in the service descriptor
     DeploymentOptions options = new DeploymentOptions().setIsolationGroup("othergroup").setWorker(false).setExtraClasspath(extraCP);
-    vertx.deployVerticle("service:my:optionsmodule", options, res -> {
+    vertx.deployVerticle("service:my.optionsmodule", options, res -> {
       assertTrue(res.succeeded());
       latch.countDown();
     });
@@ -90,7 +85,7 @@ public class FactoryTest extends VertxTestBase {
     });
     // We override the config - this overrides any config fields in the service descriptor config
     JsonObject conf = new JsonObject().put("foo", "wibble").put("quux", "blah");
-    vertx.deployVerticle("service:my:confmodule", new DeploymentOptions().setConfig(conf), res -> {
+    vertx.deployVerticle("service:my.confmodule", new DeploymentOptions().setConfig(conf), res -> {
       assertTrue(res.succeeded());
       latch.countDown();
     });
@@ -98,11 +93,55 @@ public class FactoryTest extends VertxTestBase {
   }
 
   @Test
-  public void testInvalidServiceID() throws Exception {
-    vertx.deployVerticle("service:uuhqwuhwd", res -> {
+  public void testEmptyServiceID() throws Exception {
+    vertx.deployVerticle("service:", res -> {
       assertTrue(res.failed());
       assertTrue(res.cause() instanceof IllegalArgumentException);
-      assertTrue(res.cause().getMessage().startsWith("Invalid service identifier"));
+      assertTrue(res.cause().getMessage().startsWith("Invalid identifier"));
+      testComplete();
+    });
+    await();
+  }
+
+  @Test
+  public void testNoSuchService() throws Exception {
+    vertx.deployVerticle("service:not-exists", res -> {
+      assertTrue(res.failed());
+      assertTrue(res.cause() instanceof IllegalArgumentException);
+      assertTrue(res.cause().getMessage().startsWith("Cannot find service descriptor file not-exists.json"));
+      testComplete();
+    });
+    await();
+  }
+
+  @Test
+  public void testEmptyDescriptor() throws Exception {
+    vertx.deployVerticle("service:my.empty", res -> {
+      assertTrue(res.failed());
+      assertTrue(res.cause() instanceof IllegalArgumentException);
+      assertTrue(res.cause().getMessage().startsWith("my.empty.json is empty"));
+      testComplete();
+    });
+    await();
+  }
+
+  @Test
+  public void testInvalidJSON() throws Exception {
+    vertx.deployVerticle("service:my.invalid", res -> {
+      assertTrue(res.failed());
+      assertTrue(res.cause() instanceof IllegalArgumentException);
+      assertTrue(res.cause().getMessage().startsWith("my.invalid.json contains invalid json"));
+      testComplete();
+    });
+    await();
+  }
+
+  @Test
+  public void testNoMain() throws Exception {
+    vertx.deployVerticle("service:my.nomain", res -> {
+      assertTrue(res.failed());
+      assertTrue(res.cause() instanceof IllegalArgumentException);
+      assertTrue(res.cause().getMessage().startsWith("my.nomain.json does not contain a main field"));
       testComplete();
     });
     await();
