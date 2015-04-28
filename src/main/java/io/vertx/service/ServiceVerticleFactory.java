@@ -17,11 +17,13 @@
 package io.vertx.service;
 
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.VerticleFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -43,40 +45,44 @@ public class ServiceVerticleFactory implements VerticleFactory {
   }
 
   @Override
-  public String resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader) throws Exception {
+  public void resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader, Future<String> resolution) {
     identifier = VerticleFactory.removePrefix(identifier);
     String descriptorFile = identifier + ".json";
-    JsonObject descriptor;
-    try (InputStream is = classLoader.getResourceAsStream(descriptorFile)) {
-      if (is == null) {
-        throw new IllegalArgumentException("Cannot find service descriptor file " + descriptorFile + " on classpath");
+    try {
+      JsonObject descriptor;
+      String main;
+      try (InputStream is = classLoader.getResourceAsStream(descriptorFile)) {
+        if (is == null) {
+          throw new IllegalArgumentException("Cannot find service descriptor file " + descriptorFile + " on classpath");
+        }
+        try (Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
+          String conf = scanner.next();
+          descriptor = new JsonObject(conf);
+        } catch (NoSuchElementException e) {
+          throw new IllegalArgumentException(descriptorFile + " is empty");
+        } catch (DecodeException e) {
+          throw new IllegalArgumentException(descriptorFile + " contains invalid json");
+        }
       }
-      try (Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
-        String conf = scanner.next();
-        descriptor = new JsonObject(conf);
-      } catch (NoSuchElementException e) {
-        throw new IllegalArgumentException(descriptorFile + " is empty");
-      } catch (DecodeException e) {
-        throw new IllegalArgumentException(descriptorFile + " contains invalid json");
+      main = descriptor.getString("main");
+      if (main == null) {
+        throw new IllegalArgumentException(descriptorFile + " does not contain a main field");
       }
-    }
-    String main = descriptor.getString("main");
-    if (main == null) {
-      throw new IllegalArgumentException(descriptorFile + " does not contain a main field");
-    }
 
-    // Any options specified in the service config will override anything specified at deployment time
-    // With the exception of config which can be overridden with config provided at deployment time
-    JsonObject depOptions = deploymentOptions.toJson();
-    JsonObject depConfig = depOptions.getJsonObject("config", new JsonObject());
-    JsonObject serviceOptions = descriptor.getJsonObject("options", new JsonObject());
-    JsonObject serviceConfig = serviceOptions.getJsonObject("config", new JsonObject());
-    depOptions.mergeIn(serviceOptions);
-    serviceConfig.mergeIn(depConfig);
-    depOptions.put("config", serviceConfig);
-    deploymentOptions.fromJson(depOptions);
-
-    return main;
+      // Any options specified in the service config will override anything specified at deployment time
+      // With the exception of config which can be overridden with config provided at deployment time
+      JsonObject depOptions = deploymentOptions.toJson();
+      JsonObject depConfig = depOptions.getJsonObject("config", new JsonObject());
+      JsonObject serviceOptions = descriptor.getJsonObject("options", new JsonObject());
+      JsonObject serviceConfig = serviceOptions.getJsonObject("config", new JsonObject());
+      depOptions.mergeIn(serviceOptions);
+      serviceConfig.mergeIn(depConfig);
+      depOptions.put("config", serviceConfig);
+      deploymentOptions.fromJson(depOptions);
+      resolution.complete(main);
+    } catch (Exception e) {
+      resolution.fail(e);
+    }
   }
 
   @Override
