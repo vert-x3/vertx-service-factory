@@ -9,4 +9,4 @@ and can also contain deployment options for the verticle such as whether it shou
 config for the service.
 
 The documentation is available [here](src/main/asciidoc/index.ad), or on the the 
-[vert.x web site](http://vertx.io/docs/vertx-service-factory].
+[vert.x web site](http://vertx.io/docs/vertx-service-factory).
