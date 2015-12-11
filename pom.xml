@@ -16,6 +16,7 @@
   <name>Vert.x Service Factory</name>
 
   <properties>
+    <asciidoc.dir>${project.basedir}/src/main/asciidoc</asciidoc.dir>
     <stack.version>3.2.0-SNAPSHOT</stack.version>
   </properties>
 
@@ -50,6 +51,41 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-docgen</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-codetrans</artifactId>
+      <optional>true</optional>
+    </dependency>
+
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <annotationProcessors>
+                <annotationProcessor>io.vertx.docgen.JavaDocGenProcessor</annotationProcessor>
+              </annotationProcessors>
+              <compilerArgs>
+                <arg>-Adocgen.output=${asciidoc.dir}</arg>
+                <arg>-Amaven.groupId=${project.groupId}</arg>
+                <arg>-Amaven.artifactId=${project.artifactId}</arg>
+                <arg>-Amaven.version=${project.version}</arg>
+              </compilerArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
