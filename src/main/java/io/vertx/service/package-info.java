@@ -1,9 +1,10 @@
 /**
  * # Vert.x Service Factory
  *
- * This is a `VerticleFactory` implementation which deploys a verticle given a service name. Notice that this factory
- * is not related to http://vertx.io/docs/vertx-service-proxy/[vert.x service proxies], but is about facilities to
- * deploy components.
+ * The vert.x service factory is an implementation of VerticleFactory which deploys a verticle given a service (id)
+ * name. Notice that this factory is not directly related to
+ * http://vertx.io/docs/vertx-service-proxy/[vert.x service proxies], but is about facilities to deploy
+ * individual components.
  *
  * The service name is used to lookup a JSON descriptor file which determines the actual verticle that is to be deployed,
  * and can also contain deployment options for the verticle such as whether it should be run as a worker, and default
