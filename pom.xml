@@ -11,13 +11,13 @@
   </parent>
 
   <artifactId>vertx-service-factory</artifactId>
-  <version>3.3.0-SNAPSHOT</version>
+  <version>3.2.1</version>
 
   <name>Vert.x Service Factory</name>
 
   <properties>
     <asciidoc.dir>${project.basedir}/src/main/asciidoc</asciidoc.dir>
-    <stack.version>3.3.0-SNAPSHOT</stack.version>
+    <stack.version>3.2.1</stack.version>
   </properties>
 
   <dependencyManagement>
