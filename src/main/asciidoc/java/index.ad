@@ -4,7 +4,7 @@ The vert.x service factory is an implementation of VerticleFactory which deploys
 name.
 
 Notice that this factory is not directly related to
-http://vertx.io/docs/vertx-service-proxy/[vert.x service proxies], but is about facilities to deploy
+http://vertx.io/docs/vertx-service-proxy/java[vert.x service proxies], but is about facilities to deploy
 individual components.
 
 The service name is used to lookup a JSON descriptor file which determines the actual verticle that is to be deployed,
