@@ -8,5 +8,5 @@ The service name is used to lookup a JSON descriptor file which determines the a
 and can also contain deployment options for the verticle such as whether it should be run as a worker, and default
 config for the service.
 
-The documentation is available [here](src/main/asciidoc/index.ad), or on the the 
+The documentation is available [here](src/main/asciidoc/java/index.ad), or on the the 
 [vert.x web site](http://vertx.io/docs/vertx-service-factory).
