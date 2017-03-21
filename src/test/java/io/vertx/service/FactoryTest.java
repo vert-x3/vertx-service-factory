@@ -30,7 +30,7 @@ public class FactoryTest extends VertxTestBase {
       assertTrue(res.succeeded());
       latch.countDown();
     });
-    waitUntil(() -> vertx.deploymentIDs().size() == 1);
+    assertWaitUntil(() -> vertx.deploymentIDs().size() == 1);
     awaitLatch(latch);
   }
 
@@ -55,7 +55,7 @@ public class FactoryTest extends VertxTestBase {
         latch.countDown();
       });
     });
-    waitUntil(() -> vertx.deploymentIDs().size() == 0);
+    assertWaitUntil(() -> vertx.deploymentIDs().size() == 0);
     awaitLatch(latch);
   }
 
