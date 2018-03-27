@@ -1,9 +1,7 @@
 # Vert.x Service Factory
 
 The vert.x service factory is an implementation of VerticleFactory which deploys a verticle given a service (id)
-name.
-
-Notice that this factory is not directly related to
+name. Notice that this factory is not directly related to
 http://vertx.io/docs/vertx-service-proxy/java[vert.x service proxies], but is about facilities to deploy
 individual components.
 
@@ -28,9 +26,9 @@ classpath. E.g:
 When deploying the service use the prefix `service:`, this selects the service verticle factory.
 The verticle can be deployed programmatically e.g.:
 
-[source,java]
+[source,$lang]
 ----
-vertx.deployVerticle("service:com.mycompany.clever-db-service", options);
+{@link examples.Examples#example1(io.vertx.core.Vertx, io.vertx.core.DeploymentOptions)}
 ----
 
 Or can be deployed on the command line with:
@@ -43,7 +41,7 @@ vertx run service:com.mycompany-clever-db-service
 ## Making it available
 
 Vert.x picks up `VerticleFactory` implementations from the classpath, so you just need to make sure the
-vertx-service-factory jar file on the classpath. First you need to add the Maven verticle factory to your application's
+${maven.artifactId} jar file on the classpath. First you need to add the Maven verticle factory to your application's
 classpath. If you are using a fat jar, you can use the following dependencies:
 
 * Maven (in your `pom.xml`):
@@ -51,9 +49,9 @@ classpath. If you are using a fat jar, you can use the following dependencies:
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-  <groupId>io.vertx</groupId>
-  <artifactId>vertx-service-factory</artifactId>
-  <version>3.5.1</version>
+  <groupId>${maven.groupId}</groupId>
+  <artifactId>${maven.artifactId}</artifactId>
+  <version>${maven.version}</version>
 </dependency>
 ----
 
@@ -61,15 +59,15 @@ classpath. If you are using a fat jar, you can use the following dependencies:
 
 [source,groovy,subs="+attributes"]
 ----
-compile 'io.vertx:vertx-service-factory:3.5.1'
+compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
 ----
 
 You can also register a `VerticleFactory` instances programmatically on your `vertx` instance using the
-`link:../../apidocs/io/vertx/core/Vertx.html#registerVerticleFactory-io.vertx.core.spi.VerticleFactory-[registerVerticleFactory]` method:
+{@link io.vertx.core.Vertx#registerVerticleFactory(io.vertx.core.spi.VerticleFactory)} method:
 
-[source,java]
+[source,$lang]
 ----
-vertx.registerVerticleFactory(new ServiceVerticleFactory());
+{@link examples.Examples#example2(io.vertx.core.Vertx)}
 ----
 
 ## Service descriptor
@@ -109,7 +107,7 @@ service from Maven at run-time:
 }
 ----
 
-The JSON can also provide an `options` field which maps exactly to a `link:../../apidocs/io/vertx/core/DeploymentOptions.html[DeploymentOptions]` object.
+The JSON can also provide an `options` field which maps exactly to a {@link io.vertx.core.DeploymentOptions} object.
 
 [source]
 ----
