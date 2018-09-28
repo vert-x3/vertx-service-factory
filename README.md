@@ -1,6 +1,6 @@
 # Vert.x Service Factory
 
-[![Build Status](https://vertx.ci.cloudbees.com/buildStatus/icon?job=vert.x3-service-factory)](https://vertx.ci.cloudbees.com/view/vert.x-3/job/vert.x3-service-factory/)
+[![Build Status](https://travis-ci.org/vert-x3/vertx-service-factory.svg?branch=master)](https://travis-ci.org/vert-x3/vertx-service-factory)
 
 This is a `VerticleFactory` implementation which deploys a verticle given a service name.
 
