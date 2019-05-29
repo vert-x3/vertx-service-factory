@@ -18,12 +18,12 @@ package io.vertx.service;
 
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.VerticleFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -45,7 +45,7 @@ public class ServiceVerticleFactory implements VerticleFactory {
   }
 
   @Override
-  public void resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader, Future<String> resolution) {
+  public void resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader, Promise<String> resolution) {
     identifier = VerticleFactory.removePrefix(identifier);
     String descriptorFile = identifier + ".json";
     try {
