@@ -25,6 +25,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -39,7 +40,13 @@ public class Verticle3 extends AbstractVerticle {
       DeploymentOptions expected = new DeploymentOptions().setConfig(new JsonObject().put("foo", "bar"))
         .setWorker(true).setIsolationGroup("mygroup").setExtraClasspath(extraCP);
       Deployment dep = ((VertxInternal) vertx).getDeployment(Vertx.currentContext().deploymentID());
-      vertx.eventBus().publish("moduleStarted", expected.equals(dep.deploymentOptions()));
+      DeploymentOptions options = dep.deploymentOptions();
+      boolean val =
+        Objects.equals(options.getConfig(), expected.getConfig()) &&
+        Objects.equals(options.getIsolatedClasses(), expected.getIsolatedClasses()) &&
+        Objects.equals(options.getExtraClasspath(), expected.getExtraClasspath()) &&
+        Objects.equals(options.getInstances(), expected.getInstances());
+      vertx.eventBus().publish("moduleStarted", val);
     });
   }
 
