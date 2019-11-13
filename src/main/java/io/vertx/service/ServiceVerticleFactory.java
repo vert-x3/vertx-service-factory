@@ -27,6 +27,7 @@ import io.vertx.core.spi.VerticleFactory;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
 /**
  * This verticle factory looks for a descriptor file on the classpath with a name given by the verticleName
@@ -91,9 +92,7 @@ public class ServiceVerticleFactory implements VerticleFactory {
   }
 
   @Override
-  public Verticle createVerticle(String verticleName, ClassLoader classLoader) throws Exception {
-    throw new IllegalStateException("Shouldn't be called");
+  public void createVerticle(String verticleName, ClassLoader classLoader, Promise<Callable<Verticle>> promise) {
+    promise.fail("Shouldn't be called");
   }
-
-
 }
