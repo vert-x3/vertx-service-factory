@@ -16,8 +16,8 @@
 
 package io.vertx.service;
 
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.DecodeException;
@@ -41,13 +41,18 @@ import java.util.concurrent.Callable;
 public class ServiceVerticleFactory implements VerticleFactory {
 
   @Override
-  public boolean requiresResolve() {
-    return true;
+  public String prefix() {
+    return "service";
   }
 
   @Override
-  public void resolve(String identifier, DeploymentOptions deploymentOptions, ClassLoader classLoader, Promise<String> resolution) {
-    identifier = VerticleFactory.removePrefix(identifier);
+  public void createVerticle(String verticleName, ClassLoader classLoader, Promise<Callable<Verticle>> promise) {
+    createVerticle(verticleName, new DeploymentOptions(), classLoader, promise);
+  }
+
+  protected void createVerticle(String verticleName, DeploymentOptions deploymentOptions, ClassLoader classLoader, Promise<Callable<Verticle>> promise) {
+
+    String identifier = VerticleFactory.removePrefix(verticleName);
     String descriptorFile = identifier + ".json";
     try {
       JsonObject descriptor;
@@ -72,27 +77,30 @@ public class ServiceVerticleFactory implements VerticleFactory {
 
       // Any options specified in the service config will override anything specified at deployment time
       // With the exception of config which can be overridden with config provided at deployment time
-      JsonObject depOptions = deploymentOptions.toJson();
-      JsonObject depConfig = depOptions.getJsonObject("config", new JsonObject());
+      ;
+
       JsonObject serviceOptions = descriptor.getJsonObject("options", new JsonObject());
-      JsonObject serviceConfig = serviceOptions.getJsonObject("config", new JsonObject());
-      depOptions.mergeIn(serviceOptions);
-      serviceConfig.mergeIn(depConfig);
-      depOptions.put("config", serviceConfig);
-      deploymentOptions.fromJson(depOptions);
-      resolution.complete(main);
+      serviceOptions.mergeIn(deploymentOptions.toJson());
+
+      promise.complete(() -> new AbstractVerticle() {
+        @Override
+        public void start(Promise<Void> startPromise) {
+          DeploymentOptions dopt = new DeploymentOptions(serviceOptions);
+          if (dopt.getConfig() == null) {
+            dopt.setConfig(new JsonObject());
+          }
+          dopt.getConfig().mergeIn(context.config());
+          vertx.deployVerticle(main, dopt, ar -> {
+            if (ar.succeeded()) {
+              startPromise.complete();
+            } else {
+              startPromise.fail(ar.cause());
+            }
+          });
+        }
+      });
     } catch (Exception e) {
-      resolution.fail(e);
+      promise.fail(e);
     }
-  }
-
-  @Override
-  public String prefix() {
-    return "service";
-  }
-
-  @Override
-  public void createVerticle(String verticleName, ClassLoader classLoader, Promise<Callable<Verticle>> promise) {
-    promise.fail("Shouldn't be called");
   }
 }

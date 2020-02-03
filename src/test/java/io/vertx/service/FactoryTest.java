@@ -30,7 +30,7 @@ public class FactoryTest extends VertxTestBase {
       assertTrue(res.succeeded());
       latch.countDown();
     });
-    assertWaitUntil(() -> vertx.deploymentIDs().size() == 1);
+    assertWaitUntil(() -> vertx.deploymentIDs().size() == 2);
     awaitLatch(latch);
   }
 
@@ -48,13 +48,12 @@ public class FactoryTest extends VertxTestBase {
     vertx.eventBus().localConsumer("moduleStopped").handler(message -> {
       latch.countDown();
     });
-    vertx.deployVerticle("service:" + serviceName, res -> {
-      assertTrue(res.succeeded());
-      vertx.undeploy(res.result(), res2 -> {
+    vertx.deployVerticle("service:" + serviceName, onSuccess(id -> {
+      vertx.undeploy(id, res2 -> {
         assertTrue(res2.succeeded());
         latch.countDown();
       });
-    });
+    }));
     assertWaitUntil(() -> vertx.deploymentIDs().size() == 0);
     awaitLatch(latch);
   }
@@ -137,7 +136,7 @@ public class FactoryTest extends VertxTestBase {
   }
 
   @Test
-  public void testNoMain() throws Exception {
+  public void testNoMain() {
     vertx.deployVerticle("service:my.nomain", res -> {
       assertTrue(res.failed());
       assertTrue(res.cause() instanceof IllegalArgumentException);
