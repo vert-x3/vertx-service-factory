@@ -80,12 +80,13 @@ public class ServiceVerticleFactory implements VerticleFactory {
       ;
 
       JsonObject serviceOptions = descriptor.getJsonObject("options", new JsonObject());
-      serviceOptions.mergeIn(deploymentOptions.toJson());
+      JsonObject mergedDeploymentOptions = deploymentOptions.toJson();
+      mergedDeploymentOptions.mergeIn(serviceOptions);
 
       promise.complete(() -> new AbstractVerticle() {
         @Override
         public void start(Promise<Void> startPromise) {
-          DeploymentOptions dopt = new DeploymentOptions(serviceOptions);
+          DeploymentOptions dopt = new DeploymentOptions(mergedDeploymentOptions);
           if (dopt.getConfig() == null) {
             dopt.setConfig(new JsonObject());
           }

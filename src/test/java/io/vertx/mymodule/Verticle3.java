@@ -17,7 +17,9 @@
 package io.vertx.mymodule;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.Deployment;
 import io.vertx.core.impl.VertxInternal;
@@ -33,8 +35,11 @@ import java.util.Objects;
 public class Verticle3 extends AbstractVerticle {
 
   @Override
-  public void start() throws Exception {
-
+  public void start() {
+    if (!Context.isOnWorkerThread()) {
+      vertx.eventBus().publish("moduleStarted", false);
+      return;
+    }
     vertx.runOnContext(v -> {
       List<String> extraCP = Arrays.asList("blah", "wibble");
       DeploymentOptions expected = new DeploymentOptions().setConfig(new JsonObject().put("foo", "bar"))
