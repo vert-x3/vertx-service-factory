@@ -9,12 +9,12 @@
   </parent>
 
   <artifactId>vertx-service-factory</artifactId>
-  <version>4.3.7-SNAPSHOT</version>
+  <version>4.3.8-SNAPSHOT</version>
 
   <name>Vert.x Service Factory</name>
 
   <properties>
-    <stack.version>4.3.7-SNAPSHOT</stack.version>
+    <stack.version>4.3.8-SNAPSHOT</stack.version>
   </properties>
 
   <dependencyManagement>
