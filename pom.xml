@@ -13,6 +13,12 @@
 
   <name>Vert.x Service Factory</name>
 
+  <scm>
+    <connection>scm:git:git@github.com:vert-x3/vertx-service-factory.git</connection>
+    <developerConnection>scm:git:git@github.com:vert-x3/vertx-service-factory.git</developerConnection>
+    <url>git@github.com:vert-x3/vertx-service-factory.git</url>
+  </scm>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
